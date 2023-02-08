@@ -11,7 +11,6 @@
 	70103: Mount-WIMFile - Invalid path or file name.
 	70104: Mount-WIMFile - No WIM file found in script directory .
 	70105: Mount-WIMFile - Failed to delete SymbolicLink extract folder.
-	70106: Mount-WIMFile - Failed to delete SymbolicLink extract folder.
 	70107: Mount-WIMFile - Failed to extract WIM file in folder.
 	70108: Mount-WIMFile - Failed to extract WIM file in folder using wimlib.exe.
 	70109: Mount-WIMFile - Extracting WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory).
@@ -34,8 +33,8 @@
 	70126: New-RemediationDismountTask - Failed to register remediation scheduled task.
 
 	Author:  Leonardo Franco Maragna
-	Version: 1.0
-	Date:    2023/02/07
+	Version: 1.0.1
+	Date:    2023/02/08
 #>
 [CmdletBinding()]
 Param (
@@ -49,8 +48,8 @@ Param (
 ## Variables: Extension Info
 $WIMFileExtName = "WIMFileExtension"
 $WIMFileExtScriptFriendlyName = "WIM File Extension"
-$WIMFileExtScriptVersion = "1.0"
-$WIMFileExtScriptDate = "2023/02/07"
+$WIMFileExtScriptVersion = "1.0.1"
+$WIMFileExtScriptDate = "2023/02/08"
 $WIMFileExtSubfolder = "PSADT.WIMFile"
 $WIMFileExtConfigFileName = "WIMFileConfig.xml"
 
@@ -116,7 +115,7 @@ Function Mount-WIMFile {
 		Mounts a WIM file in the MountDir folder (Files directory by default).
 	.DESCRIPTION
 		Mounts a WIM file in the MountDir folder (Files directory by default) so the rest of the script can use the content.
-	.PARAMETER FilePath
+	.PARAMETER Path
 		Path to the file to be mounted. If no value is supplied, the script directory is scanned searching for WIM files.
 	.PARAMETER Name
 		Specifies the name of an image in the WIM file.
@@ -130,6 +129,12 @@ Function Mount-WIMFile {
 		Continue if an error occured while trying to start the process. Default: $false.
 	.PARAMETER DisableFunctionLogging
 		Disables logging messages to the script log file.
+	.INPUTS
+		None
+		You cannot pipe objects to this function.
+	.OUTPUTS
+		None
+		Creates and object indicating the Path of the MountDir.
 	.EXAMPLE
 		Mount-WIMFile
 		If the file is in the script directory of the App Deploy Toolkit, it will be mounted in Files folder.
@@ -150,7 +155,8 @@ Function Mount-WIMFile {
 	Param (
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNullorEmpty()]
-		[string]$FilePath,
+		[Alias('FilePath')]
+		[string]$Path,
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNullorEmpty()]
 		[string]$Name,
@@ -163,11 +169,10 @@ Function Mount-WIMFile {
 		[Parameter(Mandatory = $false)]
 		[boolean]$PassThru = $true,
 		[Parameter(Mandatory = $false)]
-		[ValidateNotNullorEmpty()]
 		[boolean]$ContinueOnError = $false,
 		[switch]$DisableFunctionLogging
 	)
-	
+
 	Begin {
 		## Get the name of this function and write header
 		[string]${CmdletName} = $PSCmdlet.MyInvocation.MyCommand.Name
@@ -177,7 +182,7 @@ Function Mount-WIMFile {
 		if ($configToolkitLogDebugMessage) { $DisableFunctionLogging = $false }
 	}
 	Process {
-		## Get full path of MuntDir parameter
+		## Get full path of MountDir parameter
 		try {
 			$MountDir = [IO.Path]::GetFullPath($MountDir)
 		}
@@ -190,15 +195,15 @@ Function Mount-WIMFile {
 			return
 		}
 
-		if ($FilePath) {
-			## Validate and find the fully qualified path for the $FilePath variable.
-			if (([IO.Path]::IsPathRooted($FilePath)) -and ([IO.Path]::HasExtension($FilePath))) {
-				if (-not ($DisableFunctionLogging)) { Write-Log -Message "[$FilePath] is a valid fully qualified path, continue." -Source ${CmdletName} }
-				if (-not (Test-Path -LiteralPath $FilePath -PathType Leaf -ErrorAction Stop)) {
-					Write-Log -Message "File [$FilePath] not found." -Severity 3 -Source ${CmdletName}
+		if ($Path) {
+			## Validate and find the fully qualified path for the $Path variable.
+			if (([IO.Path]::IsPathRooted($Path)) -and ([IO.Path]::HasExtension($Path))) {
+				if (-not ($DisableFunctionLogging)) { Write-Log -Message "[$Path] is a valid fully qualified path, continue." -Source ${CmdletName} }
+				if (-not (Test-Path -LiteralPath $Path -PathType Leaf -ErrorAction Stop)) {
+					Write-Log -Message "File [$Path] not found." -Severity 3 -Source ${CmdletName}
 					if (-not $ContinueOnError) {
 						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70102 }
-						throw "File [$FilePath] not found."
+						throw "File [$Path] not found."
 					}
 					return
 				}
@@ -212,20 +217,20 @@ Function Mount-WIMFile {
 				$env:PATH = $PathFolders + ";" + $env:PATH
 
 				#  Get the fully qualified path for the file. Get-Command searches PATH environment variable to find this value.
-				[string]$FullyQualifiedPath = Get-Command -Name $FilePath -CommandType "Application" -TotalCount 1 -Syntax -ErrorAction Stop
+				[string]$FullyQualifiedPath = Get-Command -Name $Path -CommandType "Application" -TotalCount 1 -Syntax -ErrorAction Stop
 
 				#  Revert the PATH environment variable to it's original value
 				$env:PATH = $env:PATH -replace [regex]::Escape($PathFolders + ";"), ""
 
 				if ($FullyQualifiedPath) {
-					if (-not ($DisableFunctionLogging)) { Write-Log -Message "[$FilePath] successfully resolved to fully qualified path [$FullyQualifiedPath]." -Source ${CmdletName} }
-					$FilePath = $FullyQualifiedPath
+					if (-not ($DisableFunctionLogging)) { Write-Log -Message "[$Path] successfully resolved to fully qualified path [$FullyQualifiedPath]." -Source ${CmdletName} }
+					$Path = $FullyQualifiedPath
 				}
 				else {
-					Write-Log -Message "[$FilePath] contains an invalid path or file name." -Severity 3 -Source ${CmdletName}
+					Write-Log -Message "[$Path] contains an invalid path or file name." -Severity 3 -Source ${CmdletName}
 					if (-not $ContinueOnError) {
 						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70103 }
-						throw "[$FilePath] contains an invalid path or file name."
+						throw "[$Path] contains an invalid path or file name."
 					}
 					return
 				}
@@ -239,11 +244,11 @@ Function Mount-WIMFile {
 				Write-Log -Message "Multiple WIM files found [$($wimFile.Name -join ', ')]." -Severity 2 -Source ${CmdletName}
 				$wimFile = $wimFile | Sort-Object -Property LastWriteTime, Length | Select-Object -Last 1
 				Write-Log -Message "Using last modified WIM file [$($wimFile.Name)]." -Severity 2 -Source ${CmdletName}
-				$FilePath = ($wimFile).FullName
+				$Path = ($wimFile).FullName
 			}
 			elseif ($wimFile.Count -eq 1) {
 				Write-Log -Message "Using WIM file found [$($wimFile.Name)]." -Severity 2 -Source ${CmdletName}
-				$FilePath = ($wimFile).FullName
+				$Path = ($wimFile).FullName
 			}
 			else {
 				Write-Log -Message "No WIM file found in script directory [$scriptParentPath]." -Severity 3 -Source ${CmdletName}
@@ -256,9 +261,9 @@ Function Mount-WIMFile {
 		}
 
 		## File name with extension
-		$FilePathName = [IO.Path]::GetFileName($FilePath)
+		$PathName = [IO.Path]::GetFileName($Path)
 
-		## Check if the mount folder already exists and if can be deleted
+		## Check if the mount path already exists and if can be deleted
 		if (Test-Path $MountDir -ErrorAction SilentlyContinue) {
 			if ($IsAdmin) { $MountedImage = Get-WindowsImage -Mounted | Where-Object { [IO.Path]::GetFullPath($_.Path) -eq $MountDir } }
 			if ($MountedImage) {
@@ -267,7 +272,7 @@ Function Mount-WIMFile {
 				Dismount-WIMFile -ImageObject (New-Object -TypeName "PSObject" -Property @{ Path = $MountDir })
 			}
 			else {
-				Write-Log -Message "The mount folder [$MountDir] already exists, all its content will be deleted." -Severity 2 -Source ${CmdletName}
+				Write-Log -Message "The mount directory [$MountDir] already exists, all its content will be deleted." -Severity 2 -Source ${CmdletName}
 				Remove-Folder -Path $MountDir -ContinueOnError $false
 			}
 		}
@@ -278,16 +283,16 @@ Function Mount-WIMFile {
 		try {
 			## Mount WIM file in Files directory
 			if ($Name) {
-				$ImageObject = Mount-WindowsImage -ImagePath $FilePath -Path $MountDir -Name $Name
+				$ImageObject = Mount-WindowsImage -ImagePath $Path -Path $MountDir -Name $Name
 			}
 			else {
-				$ImageObject = Mount-WindowsImage -ImagePath $FilePath -Path $MountDir -Index $Index
+				$ImageObject = Mount-WindowsImage -ImagePath $Path -Path $MountDir -Index $Index
 			}
 			if ($?) {
-				Write-Log -Message "Successfully mounted WIM file [$FilePathName] in folder [$MountDir]." -Source ${CmdletName}
+				Write-Log -Message "Successfully mounted WIM file [$PathName] in folder [$MountDir]." -Source ${CmdletName}
 
 				#  Create remediation dismount task to run when the system startup
-				New-RemediationDismountTask -wimFile ([IO.Path]::GetFileName($FilePath)) -wimTargetPath $MountDir
+				New-RemediationDismountTask -wimFile ([IO.Path]::GetFileName($Path)) -wimTargetPath $MountDir
 
 				## If the passthru switch is specified, return the ImageObject
 				if ($PassThru) {
@@ -297,19 +302,17 @@ Function Mount-WIMFile {
 			}
 		}
 		catch [System.Runtime.InteropServices.COMException] {
-			Write-Log -Message "Could not mount WIM file [$FilePathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 2 -Source ${CmdletName}
+			Write-Log -Message "Could not mount WIM file [$PathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 2 -Source ${CmdletName}
 			#Write-Log -Message "[System.Runtime.InteropServices.COMException] ErrorCode: $('{0:x}' -f $_.Exception.ErrorCode)" -Severity 2 -Source ${CmdletName}
 
 			if ($_.Exception.ErrorCode -eq 0xC1420134) {
 				## The drive of the specified mount path is not supported. Please mount to a volume on a fixed drive.
 
 				## Unable to mount to the specified mount folder, the WIM file will be extracted
-				if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to extract WIM file [$FilePathName] in folder [$MountDir]." -Source ${CmdletName}}
+				if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to extract WIM file [$PathName] in folder [$MountDir]." -Source ${CmdletName} }
 
-				#  Trying to SymLink the Path
-				$ExtractDir = Join-Path -Path $envTemp -ChildPath "Mount_$($appName.Replace(" ","_"))"
-				if (Test-Path $ExtractDir -ErrorAction SilentlyContinue) {
-					Write-Log -Message "The SymbolicLink extract folder already exists [$ExtractDir], probably a failed past attempt." -Severity 2 -Source ${CmdletName}
+				## Commands to remove SymbolicLink extract folder
+				[ScriptBlock]$RemoveExtractDir = {
 					try {
 						if (-not ($DisableFunctionLogging)) { Write-Log -Message "The SymbolicLink extract folder will be deleted." -Source ${CmdletName} }
 						[IO.Directory]::Delete($ExtractDir, $true)
@@ -322,10 +325,17 @@ Function Mount-WIMFile {
 						if (-not $ContinueOnError) {
 							if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70105 }
 							throw "Failed to delete SymbolicLink extract folder [$ExtractDir]: $($_.Exception.Message)"
-						}                        
+						}
 					}
 				}
-				
+
+				#  Trying to SymLink the Path
+				[IO.FileInfo]$ExtractDir = Join-Path -Path $envTemp -ChildPath "Mount_$($installName.Replace(" ","_"))"
+				if ($ExtractDir.Exists) {
+					Write-Log -Message "The SymbolicLink extract folder already exists [$ExtractDir], probably a failed past attempt." -Severity 2 -Source ${CmdletName}
+					Invoke-Command -ScriptBlock $RemoveExtractDir -NoNewScope
+				}
+
 				try {
 					if (-not ($DisableFunctionLogging)) { Write-Log -Message "Creating SymbolicLink folder [$ExtractDir] targetting [$MountDir]." -Source ${CmdletName} }
 
@@ -333,27 +343,15 @@ Function Mount-WIMFile {
 					if ($?) {
 						if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully linked path [$MountDir] to local folder [$ExtractDir]." -Source ${CmdletName} }
 						if ($Name) {
-							$null = Expand-WindowsImage -ImagePath $FilePath -ApplyPath $ExtractDir -Name $Name
+							$null = Expand-WindowsImage -ImagePath $Path -ApplyPath $ExtractDir -Name $Name
 						}
 						else {
-							$null = Expand-WindowsImage -ImagePath $FilePath -ApplyPath $ExtractDir -Index $Index
+							$null = Expand-WindowsImage -ImagePath $Path -ApplyPath $ExtractDir -Index $Index
 						}
 						if ($?) {
-							Write-Log -Message "Successfully extracted WIM file [$FilePathName] in folder [$MountDir]." -Source ${CmdletName}
+							Write-Log -Message "Successfully extracted WIM file [$PathName] in folder [$MountDir]." -Source ${CmdletName}
 							if (-not ($DisableFunctionLogging)) { Write-Log -Message "Removing the SymbolicLink extract folder [$ExtractDir], since it is no longer needed." -Source ${CmdletName} }
-							try {
-								[IO.Directory]::Delete($ExtractDir, $true)
-								if ($?) {
-									if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully deleted SymbolicLink extract folder [$ExtractDir]." -Source ${CmdletName} }
-								}
-							}
-							catch {
-								Write-Log -Message "Failed to delete SymbolicLink extract folder [$ExtractDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
-								if (-not $ContinueOnError) {
-									if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70106 }
-									throw "Failed to delete SymbolicLink extract folder [$ExtractDir]: $($_.Exception.Message)"
-								}
-							}
+							Invoke-Command -ScriptBlock $RemoveExtractDir -NoNewScope
 
 							if ($PassThru) {
 								if (-not ($DisableFunctionLogging)) { Write-Log -Message "PassThru parameter specified, returning extraction details object." -Source ${CmdletName} }
@@ -364,10 +362,10 @@ Function Mount-WIMFile {
 					}
 				}
 				catch {
-					Write-Log -Message "Failed to extract WIM file [$FilePathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
+					Write-Log -Message "Failed to extract WIM file [$PathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
 					if (-not $ContinueOnError) {
 						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70107 }
-						throw "Failed to extract WIM file [$FilePathName] in folder [$MountDir]: $($_.Exception.Message)"
+						throw "Failed to extract WIM file [$PathName] in folder [$MountDir]: $($_.Exception.Message)"
 					}
 				}
 			}
@@ -375,11 +373,11 @@ Function Mount-WIMFile {
 				## Trying to use wimlib to workaround elevation
 				if ($wimlibApplicationPath -and $wimlibLibraryPath) {
 					#  Unable to mount to the specified mount folder, the WIM file will be extracted using wimlib.exe
-					if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to extract WIM file [$FilePathName] in folder [$MountDir] using wimlib.exe." -Source ${CmdletName} }
+					if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to extract WIM file [$PathName] in folder [$MountDir] using wimlib.exe." -Source ${CmdletName} }
 					try {
-						$ExtractedResult = Execute-Process -Path $wimlibApplicationPath -Parameter @("apply", $FilePath, $MountDir) -WindowStyle Hidden -PassThru
+						$ExtractedResult = Execute-Process -Path $wimlibApplicationPath -Parameter @("apply", $Path, $MountDir) -WindowStyle Hidden -PassThru
 						if ($? -and $ExtractedResult.ExitCode -eq 0) {
-							if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully extracted WIM file [$FilePathName] in folder [$MountDir] using wimlib.exe." -Source ${CmdletName} }
+							if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully extracted WIM file [$PathName] in folder [$MountDir] using wimlib.exe." -Source ${CmdletName} }
 							if ($PassThru) {
 								if (-not ($DisableFunctionLogging)) { Write-Log -Message "PassThru parameter specified, returning extraction details object." -Source ${CmdletName} }
 								[psobject]$ImageObject = New-Object -TypeName "PSObject" -Property @{ Path = $MountDir }
@@ -388,10 +386,10 @@ Function Mount-WIMFile {
 						}
 					}
 					catch {
-						Write-Log -Message "Failed to extract WIM file [$FilePathName] in folder [$MountDir] using wimlib.exe.`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
+						Write-Log -Message "Failed to extract WIM file [$PathName] in folder [$MountDir] using wimlib.exe.`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
 						if (-not $ContinueOnError) {
 							if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70108 }
-							throw "Failed to extract WIM file [$FilePathName] in folder [$MountDir] using wimlib.exe: $($_.Exception.Message)"
+							throw "Failed to extract WIM file [$PathName] in folder [$MountDir] using wimlib.exe: $($_.Exception.Message)"
 						}
 					}
 				}
@@ -404,18 +402,18 @@ Function Mount-WIMFile {
 				}
 			}
 			else {
-				Write-Log -Message "Unexpected COMException when trying to mount WIM file [$FilePathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
+				Write-Log -Message "Unexpected COMException when trying to mount WIM file [$PathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
 				if (-not $ContinueOnError) {
 					if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70110 }
-					throw "Unexpected COMException when trying to mount WIM file [$FilePathName] in folder [$MountDir]: $($_.Exception.Message)"
+					throw "Unexpected COMException when trying to mount WIM file [$PathName] in folder [$MountDir]: $($_.Exception.Message)"
 				}
 			}
 		}
 		catch {
-			Write-Log -Message "Failed to mount WIM file [$FilePathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
+			Write-Log -Message "Failed to mount WIM file [$PathName] in folder [$MountDir].`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
 			if (-not $ContinueOnError) {
 				if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70111 }
-				throw "Failed to mount WIM file [$FilePathName] in folder [$MountDir]: $($_.Exception.Message)"
+				throw "Failed to mount WIM file [$PathName] in folder [$MountDir]: $($_.Exception.Message)"
 			}
 		}
 	}
@@ -441,6 +439,12 @@ Function Dismount-WIMFile {
 		Continue if an error occured while trying to start the process. Default: $false.
 	.PARAMETER DisableFunctionLogging
 		Disables logging messages to the script log file.
+	.INPUTS
+		None
+		ImageObject generated by Moun-WIMFile function.
+	.OUTPUTS
+		None
+		This function does not generate any output.
 	.EXAMPLE
 		Dismount-WIMFile -ImageObject $MountedWIMObject
 	.NOTES
@@ -452,13 +456,12 @@ Function Dismount-WIMFile {
 	#>
 	[CmdletBinding()]
 	Param (
-		[Parameter(Mandatory = $false)]
+		[Parameter(Mandatory = $false,Position=0,ValueFromPipeline=$true)]
 		$ImageObject,
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNullorEmpty()]
 		[string]$AlternativeMountDir = $dirFiles,
 		[Parameter(Mandatory = $false)]
-		[ValidateNotNullorEmpty()]
 		[boolean]$ContinueOnError = $false,
 		[switch]$DisableFunctionLogging
 	)
@@ -554,18 +557,24 @@ Function New-WIMFile {
 		Creates a WIM file with the content of CapturePath (Files directory by default) and saves it in the SavetoPath folder (Script directory by default).
 	.DESCRIPTION
 		Creates a WIM file with the content of CapturePath (Files directory by default) and saves it in the SavetoPath folder (Script directory by default).
+	.PARAMETER CapturePath
+		Path containing the files that will be added to the WIM file.
 	.PARAMETER SavetoPath
 		Specifies the folder where the WIM file will be created, by default Script directory.
 	.PARAMETER Name
 		Specifies the name of the image in the WIM file, $installName by default.
 	.PARAMETER ForceUsewimlib
 		Use wimlib instead of Windows API since the first one has better compression ratio.
-	.PARAMETER CapturePath
-		Path containing the files that will be added to the WIM file.
 	.PARAMETER ContinueOnError
 		Continue if an error is encountered. Default is: $true.
 	.PARAMETER DisableFunctionLogging
 		Disables logging messages to the script log file.
+	.INPUTS
+		None
+		You cannot pipe objects to this function.
+	.OUTPUTS
+		None
+		This function does not generate any output.
 	.EXAMPLE
 		New-WIMFile
 		The content of Files folder will be compressed and the file will be saved in Script directory.
@@ -586,18 +595,16 @@ Function New-WIMFile {
 	Param (
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNullorEmpty()]
-		[string]$SavetoPath = $scriptParentPath,
-		[Parameter(Mandatory = $false)]
-		[string]$Name = $installName,
+		[IO.FileInfo]$CapturePath = $dirFiles,
 		[Parameter(Mandatory = $false)]
 		[ValidateNotNullorEmpty()]
-		[string]$CapturePath = $dirFiles,
+		[IO.FileInfo]$SavetoPath = $scriptParentPath,
 		[Parameter(Mandatory = $false)]
+		[ValidateNotNullorEmpty()]
+		[string]$Name = $installName,
 		[switch]$ForceUsewimlib,
-		[Parameter(Mandatory = $false)]
 		[switch]$ReplaceExisting,
 		[Parameter(Mandatory = $false)]
-		[ValidateNotNullOrEmpty()]
 		[boolean]$ContinueOnError = $false,
 		[switch]$DisableFunctionLogging
 	)
@@ -611,47 +618,11 @@ Function New-WIMFile {
 		if ($configToolkitLogDebugMessage) { $DisableFunctionLogging = $false }
 	}
 	Process {
-		## Commands to find and execute wimlib if included in SupportFiles
-		[ScriptBlock]$wimlibCommands = {
-			if ($wimlibApplicationPath -and $wimlibLibraryPath) {
-				if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe." -Source ${CmdletName} }
-				try {
-					$CreatingResult = Execute-Process -Path $wimlibApplicationPath -Parameter @("capture", "`"$($CapturePath)`"", "`"$($wimFile)`"") -WindowStyle Hidden -PassThru
-					if ($? -and $CreatingResult.ExitCode -eq 0) {
-						if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully created WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe." -Source ${CmdletName} }
-					}
-				}
-				catch {
-					Write-Log -Message "Failed to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe.`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
-					if (-not $ContinueOnError) {
-						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70114 }
-						throw "Failed to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe: $($_.Exception.Message)"
-					}
-				}
-			}
-			else {
-				if ($ForceUsewimlib) {
-					Write-Log -Message "Unable to find wimlib executable and libraries inside SupportFiles folder." -Severity 3 -Source ${CmdletName}
-					if (-not $ContinueOnError) {
-						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70115 }
-						throw "Unable to find wimlib executable and libraries inside SupportFiles folder."
-					}
-				}
-				else {
-					Write-Log -Message "Creating WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory)." -Severity 3 -Source ${CmdletName}
-					if (-not $ContinueOnError) {
-						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70116 }
-						throw "Creating WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory)."
-					}
-				}
-			}  
-		}
-
 		## Get full path of CapturePath parameter
 		try {
 			$CapturePath = [IO.Path]::GetFullPath($CapturePath)
 			if ($?) {
-				if (-not (Test-Path $CapturePath -ErrorAction SilentlyContinue)) {
+				if (-not $CapturePath.Exists) {
 					Write-Log -Message "The capture path [$CapturePath] does not exist." -Severity 3 -Source ${CmdletName}
 					if (-not $ContinueOnError) {
 						if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70117 }
@@ -692,14 +663,7 @@ Function New-WIMFile {
 		}
 
 		## Create WIM file
-		if (Test-Path $SavetoPath -ErrorAction SilentlyContinue) {
-			#  Sanitize the Name parameter
-			if ([string]::IsNullOrWhiteSpace($Name)) {
-				$Name = "no_name"
-			}
-			else {
-				$Name = Remove-InvalidFileNameChars -Name ($Name.Trim())
-			}
+		if ($SavetoPath.Exists) {
 			[IO.FileInfo]$wimFile = Join-Path -Path $SavetoPath -ChildPath "$($Name).wim"
 			$wimFileName = [IO.Path]::GetFileName($wimFile)
 
@@ -728,11 +692,47 @@ Function New-WIMFile {
 				}
 			}
 
+			## Commands to find and execute wimlib if included in SupportFiles
+			[ScriptBlock]$wimlibCommands = {
+				if ($wimlibApplicationPath -and $wimlibLibraryPath) {
+					if (-not ($DisableFunctionLogging)) { Write-Log -Message "Attempting to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe." -Source ${CmdletName} }
+					try {
+						$CreatingResult = Execute-Process -Path $wimlibApplicationPath -Parameter @("capture", "`"$($CapturePath)`"", "`"$($wimFile)`"") -WindowStyle Hidden -PassThru
+						if ($? -and $CreatingResult.ExitCode -eq 0) {
+							if (-not ($DisableFunctionLogging)) { Write-Log -Message "Successfully created WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe." -Source ${CmdletName} }
+						}
+					}
+					catch {
+						Write-Log -Message "Failed to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe.`r`n$(Resolve-Error)" -Severity 3 -Source ${CmdletName}
+						if (-not $ContinueOnError) {
+							if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70114 }
+							throw "Failed to create WIM file [$wimFileName] in folder [$SavetoPath] using wimlib.exe: $($_.Exception.Message)"
+						}
+					}
+				}
+				else {
+					if ($ForceUsewimlib) {
+						Write-Log -Message "Unable to find wimlib executable and libraries inside SupportFiles folder." -Severity 3 -Source ${CmdletName}
+						if (-not $ContinueOnError) {
+							if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70115 }
+							throw "Unable to find wimlib executable and libraries inside SupportFiles folder."
+						}
+					}
+					else {
+						Write-Log -Message "Creating WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory)." -Severity 3 -Source ${CmdletName}
+						if (-not $ContinueOnError) {
+							if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70116 }
+							throw "Creating WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory)."
+						}
+					}
+				}
+			}
+
 			try {
 				if ($ForceUsewimlib) {
 					#  Using wimlib by default if included in function parameters
 					if (-not ($DisableFunctionLogging)) { Write-Log -Message "-ForceUsewimlib switch specified, using wimlib by default if included in SupportFiles." -Source ${CmdletName} }
-					Invoke-Command -ScriptBlock $wimlibCommands -NoNewScope        
+					Invoke-Command -ScriptBlock $wimlibCommands -NoNewScope
 				}
 				else {
 					#  Try using Windows API
@@ -745,8 +745,8 @@ Function New-WIMFile {
 			catch [System.Runtime.InteropServices.COMException], [System.Exception] {
 				if ($_.Exception.HResult -in (0x80070522, 0x80131500, 0x800700A1, 0x80004002)) {
 					if (-not $ForceUsewimlib) {
-						## Trying to use wimlib to workaround elevation
-						Invoke-Command -ScriptBlock $wimlibCommands -NoNewScope        
+						## Trying to use wimlib to workaround elevation and other exceptions
+						Invoke-Command -ScriptBlock $wimlibCommands -NoNewScope
 					}
 				}
 				else {
@@ -767,10 +767,10 @@ Function New-WIMFile {
 			}
 		}
 		else {
-			Write-Log -Message "The save to path [$CapturePath] does not exist." -Severity 3 -Source ${CmdletName}
+			Write-Log -Message "The save to path [$SavetoPath] does not exist." -Severity 3 -Source ${CmdletName}
 			if (-not $ContinueOnError) {
 				if ($configWIMFileGeneralOptions.ExitScriptOnError) { Exit-Script -ExitCode 70125 }
-				throw "The save to path [$CapturePath] does not exist."
+				throw "The save to path [$SavetoPath] does not exist."
 			}
 			return
 		}
@@ -803,6 +803,12 @@ Function New-RemediationDismountTask {
 		Continue if an error occured while trying to start the process. Default: $false.
 	.PARAMETER DisableFunctionLogging
 		Disables logging messages to the script log file.
+	.INPUTS
+		None
+		You cannot pipe objects to this function.
+	.OUTPUTS
+		None
+		This function does not generate any output.
 	.NOTES
 		This is an internal script function and should typically not be called directly.
 		Author: Leonardo Franco Maragna
@@ -820,7 +826,6 @@ Function New-RemediationDismountTask {
 		[ValidateNotNullorEmpty()]
 		[string]$wimTargetPath,
 		[Parameter(Mandatory = $false)]
-		[ValidateNotNullorEmpty()]
 		[boolean]$ContinueOnError = $false,
 		[switch]$DisableFunctionLogging
 	)
@@ -840,14 +845,14 @@ Function New-RemediationDismountTask {
 		## Creates remediation scheduled task
 		#  Remove illegal characters from the scheduled task name
 		[char[]]$invalidScheduledTaskChars = '$', '!', '''', '"', '(', ')', ';', '\', '`', '*', '?', '{', '}', '[', ']', '<', '>', '|', '&', '%', '#', '~', '@', ' '
-		$ScheduledTaskName = "Remediation dismount WIM file $($wimFile)"
+		$ScheduledTaskName = "Remediation_dismount_WIM_file_$($wimFile)"
 		foreach ($invalidChar in $invalidScheduledTaskChars) { $ScheduledTaskName = $ScheduledTaskName -replace [regex]::Escape($invalidChar), "" }
 
 		#  Defines the action to execute
 		$ActionVariables = @'
 $wimTargetPath = [IO.Path]::GetFullPath("{0}")
 $wimTaskName = "{1}"
-$wimFile = "{1}"
+$wimFile = "{2}"
 '@ -f ( <#0#> Split-Path -Path $wimTargetPath -Parent), ( <#1#> $ScheduledTaskName), ( <#2#> $wimFile)
 		$ActionScript = @'
 function Get-MountedImages {
@@ -887,7 +892,7 @@ if ($null -eq $MountedImages) { Unregister-ScheduledTask -TaskName $wimTaskName 
 				throw "Failed to register remediation scheduled task [$ScheduledTaskName]: $($_.Exception.Message)"
 			}
 			return
-		}    
+		}
 	}
 	End {
 		Write-FunctionHeaderOrFooter -CmdletName ${CmdletName} -Footer
@@ -907,6 +912,12 @@ Function Remove-RemediationDismountTask {
 		Specifies the name of the WIM file.
 	.PARAMETER DisableFunctionLogging
 		Disables logging messages to the script log file.
+	.INPUTS
+		None
+		You cannot pipe objects to this function.
+	.OUTPUTS
+		None
+		This function does not generate any output.
 	.NOTES
 		This is an internal script function and should typically not be called directly.
 		Author: Leonardo Franco Maragna
@@ -934,7 +945,7 @@ Function Remove-RemediationDismountTask {
 	Process {
 		#  Remove illegal characters from the scheduled task name
 		[char[]]$invalidScheduledTaskChars = '$', '!', '''', '"', '(', ')', ';', '\', '`', '*', '?', '{', '}', '[', ']', '<', '>', '|', '&', '%', '#', '~', '@', ' '
-		$ScheduledTaskName = "Remediation dismount WIM file $($wimFile)"
+		$ScheduledTaskName = "Remediation_dismount_WIM_file_$($wimFile)"
 		foreach ($invalidChar in $invalidScheduledTaskChars) { $ScheduledTaskName = $ScheduledTaskName -replace [regex]::Escape($invalidChar), "" }
 
 		$RemediationDismountTask = Get-ScheduledTask | Where-Object { $_.TaskName -like "*$($ScheduledTaskName )*" } -ErrorAction SilentlyContinue

@@ -1,20 +1,47 @@
-# PSADT.WIMFile 1.0
+# PSADT.WIMFile 1.0.1
 Extension for PowerShell App Deployment Toolkit to create and handle .WIM files.
 
 ## Features
 - Creates WIM files from your **Files** directory by default.
 - Maximum compression by default.
 - Does not requires administrative rights to mount (extracts if can't mount).
-- Does not requires administrative rights to create (requires [wimlib](https://github.com/LFM8787/PSADT.WIMFile/README.md#external-links)).
+- Does not requires administrative rights to create (requires [wimlib](https://github.com/LFM8787/PSADT.WIMFile/blob/master/README.md#external-links)).
 - Can extract to UNC Path.
 - Creates remediation scheduled tasks if mount/dismount fails
 - Multilanguage support.
 - *ContinueOnError* and *ExitScriptOnError* support.
 
+## Disclaimer
+```diff
+- Test the functions before production.
+- Make a backup before applying.
+- Check the config file options description.
+- Run AppDeployToolkitHelp.ps1 for more help and parameter descriptions.
+```
+
 ## Functions
 * **Mount-WIMFile** - Mounts a WIM file in the MountDir folder (Files directory by default).
 * **Dismount-WIMFile** - Dismounts a WIM file and deletes the path.
 * **New-WIMFile** - Creates a WIM file with the content of CapturePath (Files directory by default) and saves it in the SavetoPath folder (Script directory by default).
+
+## Usage
+```PowerShell
+# Creates a new WIM File based on the content of the Files directory
+New-WIMFile
+```
+
+```PowerShell
+# Comments or removes the function once it's been used
+# New-WIMFile
+
+# Mount any WIM file found in script directory (last modified one if multiple)
+$MountedObject = Mount-WIMFile
+
+# <Normal script commands go here>
+
+# Dismount the previously mounted/extracted WIM file
+$MountedObject | Dismount-WIMFile
+```
 
 ## Internal functions
 `This set of functions are internals and are not designed to be called directly`
@@ -24,12 +51,11 @@ Extension for PowerShell App Deployment Toolkit to create and handle .WIM files.
 ## Extension Exit Codes
 |Exit Code|Function|Exit Code Detail|
 |:----------:|:--------------------|:-|
-|<sub><sup>70101</sup></sub>|Mount-WIMFile|Unable to get full path from mount path.|
+|70101|Mount-WIMFile|Unable to get full path from mount path.|
 |70102|Mount-WIMFile|File not found.|
 |70103|Mount-WIMFile|Invalid path or file name.|
 |70104|Mount-WIMFile|No WIM file found in script directory .|
 |70105|Mount-WIMFile|Failed to delete SymbolicLink extract folder.|
-|70106|Mount-WIMFile|Failed to delete SymbolicLink extract folder.|
 |70107|Mount-WIMFile|Failed to extract WIM file in folder.|
 |70108|Mount-WIMFile|Failed to extract WIM file in folder using wimlib.exe.|
 |70109|Mount-WIMFile|Extracting WIM file natively requires elevation, (try downloading wimlib to [..\SupportFiles\PSADT.WIMFile\] directory).|
@@ -50,6 +76,7 @@ Extension for PowerShell App Deployment Toolkit to create and handle .WIM files.
 |70124|New-WIMFile|Failed to create WIM file in folder.|
 |70125|New-WIMFile|The save to path does not exist.|
 |70126|New-RemediationDismountTask|Failed to register remediation scheduled task.|
+
 ## How to Install
 #### 1. Download and copy into Toolkit folder.
 #### 2. Edit *AppDeployToolkitExtensions.ps1* file and add the following lines.
@@ -81,11 +108,11 @@ foreach ($Extension in $ExtensionToLoad) {
 			. $ExtensionPath
 		}
 		catch {
-			Write-Log -Message "An error occurred while trying to load the extension file [$($ExtensionPath)].`r`n$(Resolve-Error)" -Severity 3 -Source $ToastNotificationExtName
+			Write-Log -Message "An error occurred while trying to load the extension file [$($ExtensionPath)].`r`n$(Resolve-Error)" -Severity 3 -Source $appDeployToolkitExtName
 		}
 	}
 	else {
-		Write-Log -Message "Unable to locate the extension file [$($ExtensionPath)]." -Severity 2 -Source $ToastNotificationExtName
+		Write-Log -Message "Unable to locate the extension file [$($ExtensionPath)]." -Severity 2 -Source $appDeployToolkitExtName
 	}
 }
 ```
@@ -94,5 +121,30 @@ foreach ($Extension in $ExtensionToLoad) {
 * Powershell 5.1+
 * PSAppDeployToolkit 3.8.4+
 
+## Multilanguage support progress (feel free to upload translated strings):
+* 🇺🇸 100%
+* 🇩🇰 0%
+* 🇫🇷 0%
+* 🇩🇪 0%
+* 🇮🇹 0%
+* 🇯🇵 0%
+* 🇳🇴 0%
+* 🇳🇱 0%
+* 🇵🇱 0%
+* 🇵🇹 0%
+* 🇧🇷 0%
+* 🇪🇸 100%
+* 🇸🇪 0%
+* 🇸🇦 0%
+* 🇮🇱 0%
+* 🇰🇷 0%
+* 🇷🇺 0%
+* 🇨🇳 (Simplified) 0%
+* 🇨🇳 (Traditional) 0%
+* 🇸🇰 0%
+* 🇨🇿 0%
+* 🇭🇺 0%
+
 ## External Links
-[wimlib: the open source Windows Imaging (WIM) library](https://wimlib.net/)
+* [PowerShell App Deployment Toolkit](https://psappdeploytoolkit.com/)
+* [wimlib: the open source Windows Imaging (WIM) library](https://wimlib.net/)
