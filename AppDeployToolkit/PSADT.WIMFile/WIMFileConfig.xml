@@ -7,8 +7,8 @@
 -->
 	<!--Configuration File Details-->
 	<Config_File>
-		<Config_Version>1.0.1</Config_Version>
-		<Config_Date>2023/02/08</Config_Date>
+		<Config_Version>1.0.2</Config_Version>
+		<Config_Date>2023/02/22</Config_Date>
 	</Config_File>
 
 	<!--WIM File General Options-->
@@ -17,122 +17,430 @@
 		<!-- [True/False] - Calls the Exit-Script function to perform cleanup actions instead of only throw an error. -->
 		<ShowNewWIMFileWarningMessage>True</ShowNewWIMFileWarningMessage>
 		<!-- [True/False] - Displays a warning since by design the New-WIMFile function should only be executed at the time the WIM file is created. -->
-		<NewWIMFileWarningMessageTimeout>120</NewWIMFileWarningMessageTimeout>
+		<NewWIMFileWarningMessageTimeout>140</NewWIMFileWarningMessageTimeout>
 		<!-- Timeout before exiting the script if the warning is showed -->
-		<DeleteAlternativeMountDirWhenDismount>True</DeleteAlternativeMountDirWhenDismount>
-		<!-- [True/False] - Deletes the alternative mount directory when dismounting.
+		<DeleteAlternativeMountPathWhenDismount>True</DeleteAlternativeMountPathWhenDismount>
+		<!-- [True/False] - Deletes the alternative mount path directory when dismounting.
 			 CAUTION: by default this folder is $dirFiles! -->
 	</WIMFile_Options>
 	<!--WIM File General Options-->
 
 	<!-- UI WIM File Messages - English -->
 	<UI_Messages_EN>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_EN>
 
 	<!-- UI WIM File Messages - Danish -->
 	<UI_Messages_DA>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_DA>
 
 	<!-- UI WIM File Messages - French -->
 	<UI_Messages_FR>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_FR>
 
 	<!-- UI WIM File Messages - German -->
 	<UI_Messages_DE>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_DE>
 
 	<!-- UI WIM File Messages - Italian -->
 	<UI_Messages_IT>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_IT>
 
 	<!-- UI WIM File Messages - Japanese -->
 	<UI_Messages_JA>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_JA>
 
 	<!-- UI WIM File Messages - Norwegian (Bokmål) -->
 	<UI_Messages_NB>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_NB>
 
 	<!-- UI WIM File Messages - Dutch -->
 	<UI_Messages_NL>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_NL>
 
 	<!-- UI WIM File Messages - Polish -->
 	<UI_Messages_PL>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_PL>
 
 	<!-- UI WIM File Messages - Portuguese (Portugal) -->
 	<UI_Messages_PT>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_PT>
 
 	<!-- UI WIM File Messages - Portuguese (Brazil) -->
 	<UI_Messages_PT-BR>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_PT-BR>
 
 	<!-- UI WIM File Messages - Spanish -->
 	<UI_Messages_ES>
-		<NewWIMFile_WarningMessage>Si está viendo este mensaje es porque el script contiene la función 'New-WIMFile' de la extensión 'WIM File Extension'.`r`nPor diseño el script finalizará en este punto, quite la función para continuar.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Comprimiendo contenido en archivo WIM...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>Está viendo este mensaje porque el script contiene la función 'New-WIMFile' de la extensión 'WIM File Extension'.
+		
+		Por diseño, el script se detendrá en este punto, elimine la función para continuar con la ejecución normal del script.
+		
+		¿Desea continuar con la ejecución del script?</NewWIMFile_WarningMessage>
 	</UI_Messages_ES>
 
 	<!-- UI WIM File Messages - Swedish -->
 	<UI_Messages_SV>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_SV>
 
 	<!-- UI WIM File Messages - Arabic -->
 	<UI_Messages_AR>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_AR>
 
 	<!-- UI WIM File Messages - Hebrew -->
 	<UI_Messages_HE>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_HE>
 
 	<!-- UI WIM File Messages - Korean -->
 	<UI_Messages_KO>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_KO>
 
 	<!-- UI WIM File Messages - Russian -->
 	<UI_Messages_RU>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_RU>
 
 	<!-- UI WIM File Messages - Chinese (Simplified) -->
 	<UI_Messages_ZH-Hans>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_ZH-Hans>
 
 	<!-- UI WIM File Messages - Chinese (Traditional) -->
 	<UI_Messages_ZH-Hant>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_ZH-Hant>
 
 	<!-- UI WIM File Messages - Slovak -->
 	<UI_Messages_SK>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_SK>
 
 	<!-- UI WIM File Messages - Czech -->
 	<UI_Messages_CZ>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_CZ>
 
 	<!-- UI WIM File Messages - Hungarian-->
 	<UI_Messages_HU>
-		<NewWIMFile_WarningMessage>If you are seeing this message it is because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.`r`nBy design the script will end at this point, remove the function to continue.</NewWIMFile_WarningMessage>
+		<NewWIMFile_ProgressMessage>Compressing content in WIM file...
+
+CapturePath:
+"{0}"
+
+SavetoPath:
+"{1}"
+
+WIMFile:
+"{2}"</NewWIMFile_ProgressMessage>
+		<NewWIMFile_WarningMessage>You are seeing this message because the script contains the 'New-WIMFile' function of the 'WIM File Extension' extension.
+
+By design the script will stop at this point, remove the function to continue the normal execution of the script.
+
+Do you want to continue executing the script?</NewWIMFile_WarningMessage>
 	</UI_Messages_HU>
 
 </WIMFile_Config>
