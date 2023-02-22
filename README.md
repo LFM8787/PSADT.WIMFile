@@ -45,7 +45,7 @@ $MountedObject | Dismount-WIMFile
 
 ## Internal functions
 `This set of functions are internals and are not designed to be called directly`
-* **Expand-WIMFile** - Expand a WIM file using native method or wimlib executable if exists.
+* **Expand-WIMFile** - Expands a WIM file using native method or wimlib executable if exists.
 * **New-RemediationDismountTask** - Creates an scheduled task with remediation commands.
 * **Remove-RemediationDismountTask** - Removes a previously created remediation scheduled task.
 

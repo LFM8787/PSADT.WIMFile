@@ -435,9 +435,9 @@ Function New-WIMFile {
 Function Expand-WIMFile {
 	<#
 	.SYNOPSIS
-		Expand a WIM file using native method or wimlib executable if exists.
+		Expands a WIM file using native method or wimlib executable if exists.
 	.DESCRIPTION
-		Expand a WIM file using native method or wimlib executable if exists.
+		Expands a WIM file using native method or wimlib executable if exists.
 	.PARAMETER ImagePath
 		Absolute path to the file to be expanded.
 	.PARAMETER Name
