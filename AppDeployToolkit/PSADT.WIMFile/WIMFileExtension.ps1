@@ -34,8 +34,8 @@
 	70126: New-RemediationDismountTask - Failed to register remediation scheduled task.
 
 	Author:  Leonardo Franco Maragna
-	Version: 1.0.2
-	Date:    2023/02/22
+	Version: 1.0.3
+	Date:    2023/04/14
 #>
 [CmdletBinding()]
 Param (
@@ -49,8 +49,8 @@ Param (
 ## Variables: Extension Info
 $WIMFileExtName = "WIMFileExtension"
 $WIMFileExtScriptFriendlyName = "WIM File Extension"
-$WIMFileExtScriptVersion = "1.0.2"
-$WIMFileExtScriptDate = "2023/02/22"
+$WIMFileExtScriptVersion = "1.0.3"
+$WIMFileExtScriptDate = "2023/04/14"
 $WIMFileExtSubfolder = "PSADT.WIMFile"
 $WIMFileExtConfigFileName = "WIMFileConfig.xml"
 
@@ -789,7 +789,7 @@ Function Mount-WIMFile {
 				Write-Log -Message "Successfully mounted WIM file [$ImagePath] in path [$MountPath]." -Source ${CmdletName}
 
 				#  Create remediation dismount task to run when the system startup
-				New-RemediationDismountTask -ImagePath ([IO.Path]::GetFileName($ImagePath)) -Path $MountPath
+				New-RemediationDismountTask -ImagePath ([IO.Path]::GetFileName($ImagePath)) -DismountPath $MountPath
 
 				#  Returns the ImageObject
 				return $ImageObject
