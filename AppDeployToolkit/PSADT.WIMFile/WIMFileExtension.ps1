@@ -944,7 +944,7 @@ Function Dismount-WIMFile {
 		if (Test-Path -Path $DismountPath -ErrorAction SilentlyContinue) {
 
 			#  Check if there is a mounted wim file
-			if ($IsAdmin) { $MountedImage = Get-WindowsImage -Mounted | Where-Object { [IO.Path]::GetFullPath($_.Path).StartsWith($DismountPath.DirectoryName) } }
+			if ($IsAdmin) { $MountedImage = Get-WindowsImage -Mounted | Where-Object { [IO.Path]::GetFullPath($_.Path).StartsWith($DismountPath.DirectoryName,'CurrentCultureIgnoreCase') } }
 			if ($MountedImage) {
 				[IO.FileInfo]$ImagePath = $MountedImage.ImagePath
 				try {
