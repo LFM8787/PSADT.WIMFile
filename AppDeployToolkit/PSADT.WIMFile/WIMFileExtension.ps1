@@ -34,8 +34,8 @@
 	70126: New-RemediationDismountTask - Failed to register remediation scheduled task.
 
 	Author:  Leonardo Franco Maragna
-	Version: 1.0.3
-	Date:    2023/04/14
+	Version: 1.0.4
+	Date:    2023/11/22
 #>
 [CmdletBinding()]
 Param (
@@ -49,8 +49,8 @@ Param (
 ## Variables: Extension Info
 $WIMFileExtName = "WIMFileExtension"
 $WIMFileExtScriptFriendlyName = "WIM File Extension"
-$WIMFileExtScriptVersion = "1.0.3"
-$WIMFileExtScriptDate = "2023/04/14"
+$WIMFileExtScriptVersion = "1.0.4"
+$WIMFileExtScriptDate = "2023/11/22"
 $WIMFileExtSubfolder = "PSADT.WIMFile"
 $WIMFileExtConfigFileName = "WIMFileConfig.xml"
 
@@ -944,7 +944,7 @@ Function Dismount-WIMFile {
 		if (Test-Path -Path $DismountPath -ErrorAction SilentlyContinue) {
 
 			#  Check if there is a mounted wim file
-			if ($IsAdmin) { $MountedImage = Get-WindowsImage -Mounted | Where-Object { [IO.Path]::GetFullPath($_.Path).StartsWith($DismountPath.DirectoryName,'CurrentCultureIgnoreCase') } }
+			if ($IsAdmin) { $MountedImage = Get-WindowsImage -Mounted | Where-Object { [IO.Path]::GetFullPath($_.Path).StartsWith($DismountPath.DirectoryName, "CurrentCultureIgnoreCase") } }
 			if ($MountedImage) {
 				[IO.FileInfo]$ImagePath = $MountedImage.ImagePath
 				try {
@@ -1053,7 +1053,7 @@ $ScheduledTaskName = "{2}"
 		$ActionScript = @'
 Function Get-MountedImages {
 	Param ( [IO.FileInfo]$ImageName = $ImagePath.Name, [IO.FileInfo]$Path = $DismountPath )
-	Get-WindowsImage -Mounted | Where-Object { $_.MountStatus -eq "Invalid" -or $_.ImagePath.EndsWith($ImageName) -or [IO.Path]::GetFullPath($_.Path).StartsWith($Path.DirectoryName) }
+	Get-WindowsImage -Mounted | Where-Object { $_.MountStatus -eq "Invalid" -or $_.ImagePath.EndsWith($ImageName) -or [IO.Path]::GetFullPath($_.Path).StartsWith($Path.DirectoryName, "CurrentCultureIgnoreCase") }
 }
 
 $MountedImages = Get-MountedImages
